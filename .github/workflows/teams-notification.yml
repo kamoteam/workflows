@@ -1,0 +1,95 @@
+name: 'Teams Notification'
+
+on:
+  workflow_call:
+    inputs:
+      needs:
+        required: false
+        type: string
+
+jobs:
+  notificaton:
+    name: "Teams notification"
+    runs-on: [self-hosted,Linux,X64]
+    steps:
+    - name: "Checking CI/CD Result"
+      id: result
+      run: |
+        FAILURE_COUNT=$(gh api -H "Accept: application/vnd.github+json" /repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs \
+          | jq '.jobs[].steps[].conclusion'| grep 'failure'| wc -l)
+        
+        echo "::set-output name=failure_count::${FAILURE_COUNT}"
+
+        JOB_RESULT=$(gh api -H "Accept: application/vnd.github+json" /repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs \
+          | jq -rc '.jobs | map({ name: .name, result: .conclusion })')
+
+        echo "::set-output name=job_result=${JOB_RESULT}"
+
+    - name: "Show Result"
+      run: |
+        echo ${{ steps.result.outputs.job_result }}
+
+    - name: "Success"
+      if: ${{ steps.result.outputs.failure_count == 0 }}
+      uses: skitionek/notify-microsoft-teams@master
+      with:
+        webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+        # needs: ${{ toJson(needs) }}
+        # job: ${{ toJson(job) }}
+        steps: ${{ toJson(steps) }}
+
+    - name: "Failure"
+      if: ${{ steps.result.outputs.failure_count != 0 }}
+      uses: skitionek/notify-microsoft-teams@master
+      with:
+        webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+        needs: ${{ toJson(needs) }}
+
+  #  gh api -H "Accept: application/vnd.github+json" /repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs | jq -r '.jobs | map({ name: .name, result: .conclusion })'
+
+  # success:
+  #   name: One with everything
+  #   runs-on: [self-hosted,Linux,X64]
+  #   steps:
+  #   - name: Reset Permission
+  #     run: |
+  #       echo ${{ secrets.RUNNER_SUDO_PASSWD }} | sudo -S chown -R ${USER} ${GITHUB_WORKSPACE}
+
+  #   - uses: actions/checkout@v3
+
+  #   - name: Debug action
+  #     uses: hmarr/debug-action@v2.0.1
+
+   
+  #   - name: Microsoft Teams Notification
+  #     uses: skitionek/notify-microsoft-teams@master
+  #     if: success()
+  #     with:
+  #       webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          # needs: ${{ toJson(needs) }}
+          # job: ${{ toJson(job) }}
+          # steps: ${{ toJson(steps) }}
+
+  # if_failure:
+  #     name: Only if failure
+  #     runs-on: ubuntu-18.04
+  #     steps:
+  #       - uses: actions/checkout@master
+  #       - name: Microsoft Teams Notification
+  #         uses: skitionek/notify-microsoft-teams@master
+  #         if: failure()
+  #         with:
+  #           webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+    # ----------------------------
+
+    # - uses: toko-bifrost/ms-teams-deploy-card@master #  or "./" if in a local set-up
+    #   if: always()
+    #   with:
+    #     github-token: ${{ github.token }}
+    #     webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
+    #     card-layout-exit: true
+    #     show-on-failure: true
+    #     timezone: Asia/Tokyo
+
+
+    # ----------------------------

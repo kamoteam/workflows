@@ -1,0 +1,28 @@
+name: 'Teams Notification'
+
+on:
+  workflow_call:
+
+jobs:
+  success:
+    name: One with everything
+    runs-on: [self-hosted,Linux,X64]
+    steps:
+      - uses: actions/checkout@master
+      - name: Microsoft Teams Notification
+        uses: skitionek/notify-microsoft-teams@master
+        if: always()
+        with:
+          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          # needs: ${{ toJson(needs) }}
+          # job: ${{ toJson(job) }}
+          # steps: ${{ toJson(steps) }}
+
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   # this is the new step
+    #   - uses: toko-bifrost/ms-teams-deploy-card@master #  or "./" if in a local set-up
+    #     if: always()
+    #     with:
+    #       github-token: ${{ github.token }}
+    #       webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
