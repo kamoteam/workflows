@@ -1,0 +1,17 @@
+name: 'job-a'
+
+on:
+  workflow_call:
+
+jobs:
+  job-a:
+    name: "Teams notification"
+    runs-on: [self-hosted,Linux,X64]
+    steps:
+    - name: "Checking CI/CD Result"
+    - uses: actions/checkout@v3
+
+    - name: "Run job-a"
+      shell: bash
+      run: |
+        echo "Hello job-a"
