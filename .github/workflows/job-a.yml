@@ -8,10 +8,9 @@ jobs:
     name: "Teams notification"
     runs-on: [self-hosted,Linux,X64]
     steps:
-    - name: "Checking CI/CD Result"
     - uses: actions/checkout@v3
 
-    - name: "Run job-a"
+    - name: "Run job-c"
       shell: bash
       run: |
-        echo "Hello job-a"
+        echo "Hello job-c"
