@@ -5,7 +5,7 @@ on:
 
 jobs:
   job-c:
-    name: "Teams notification"
+    name: "job-c"
     runs-on: [self-hosted,Linux,X64]
     steps:
     - uses: actions/checkout@v3
