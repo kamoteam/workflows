@@ -20,7 +20,6 @@ jobs:
       shell: bash
       run: |
         echo "Hello job-a"
-        mkdir artifacts
         echo "Hello job-a" > artifacts/job-a.txt
 
     - name: Upload a Build Artifact
