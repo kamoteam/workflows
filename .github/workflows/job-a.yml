@@ -10,7 +10,26 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v3.0.0
+      with:
+        path: artifacts
+        name: artifacts
+
     - name: "Run job-a"
       shell: bash
       run: |
         echo "Hello job-a"
+        mkdir artifacts
+        echo "Hello job-a" > artifacts/job-a.txt
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        path: artifacts
+        name: artifacts
+
+        
+
+
+    
